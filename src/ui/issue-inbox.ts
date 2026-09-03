@@ -38,6 +38,7 @@ export const INSTALL_ISSUE_INBOX_EXPRESSION = `(() => {
   host.style.display = "inline-flex";
   host.style.flex = "0 0 auto";
   host.style.height = "28px";
+  host.style.marginInlineEnd = "6px";
   host.style.pointerEvents = "auto";
   host.style.setProperty("-webkit-app-region", "no-drag");
   const shadow = host.attachShadow({ mode: "open" });
@@ -376,15 +377,17 @@ export const INSTALL_ISSUE_INBOX_EXPRESSION = `(() => {
   overlayHost=document.createElement("span");overlayHost.id="codexion-issue-inbox-overlay";overlayHost.style.inset="0";overlayHost.style.pointerEvents="none";overlayHost.style.position="fixed";overlayHost.style.zIndex="2147483646";
   const overlayShadow=overlayHost.attachShadow({mode:"open"});overlayShadow.append(shadow.querySelector("style").cloneNode(true),surface,backdrop,triggerTooltip);surface.style.pointerEvents="auto";backdrop.style.pointerEvents="auto";document.body.append(overlayHost);
   const place = () => {
-    const openInButton=Array.from(document.querySelectorAll('button[aria-label="Open in"]')).find(button=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&rect.x>window.innerWidth/2;});
-    let openInControl=openInButton;
-    while(openInControl?.parentElement&&!openInControl.parentElement.classList?.contains("ms-auto"))openInControl=openInControl.parentElement;
-    const openInGroup=openInControl?.parentElement?.classList?.contains("ms-auto")?openInControl.parentElement:null;
-    if(openInGroup&&openInControl){let companionGroup=document.getElementById("codexion-titlebar-actions");if(!companionGroup){companionGroup=document.createElement("span");companionGroup.id="codexion-titlebar-actions";companionGroup.className="no-drag";companionGroup.style.alignItems="center";companionGroup.style.display="inline-flex";companionGroup.style.gap="6px";companionGroup.style.marginInlineEnd="6px";companionGroup.style.setProperty("-webkit-app-region","no-drag");}if(companionGroup.parentElement!==openInControl)openInControl.insertBefore(companionGroup,openInControl.firstChild);if(host.parentElement!==companionGroup)companionGroup.append(host);}
+    const isVisibleTitlebarButton=(button)=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&rect.top>=0&&rect.bottom<=54&&Boolean(button.closest("header"));};
+    const buttons=Array.from(document.querySelectorAll("button"));
+    const openInButton=buttons.find(button=>{if(!isVisibleTitlebarButton(button))return false;const label=(button.getAttribute("aria-label")||"").trim();const text=(button.innerText||"").trim().replace(/\\s+/g," ");return label==="Open in"||text==="Open in";})||buttons.find(button=>button.getAttribute("aria-label")==="Secondary action"&&isVisibleTitlebarButton(button))?.previousElementSibling;
+    const splitControl=openInButton?.parentElement?.querySelector('button[aria-label="Secondary action"]')?openInButton.parentElement:null;
+    const openInControl=splitControl||openInButton?.parentElement;
+    const openInGroup=openInControl?.parentElement;
+    if(openInGroup&&openInControl&&openInGroup.closest("header")){let companionGroup=document.getElementById("codexion-titlebar-actions");if(!companionGroup){companionGroup=document.createElement("span");companionGroup.id="codexion-titlebar-actions";companionGroup.className="no-drag";companionGroup.style.alignItems="center";companionGroup.style.display="inline-flex";companionGroup.style.gap="0";companionGroup.style.pointerEvents="auto";companionGroup.style.setProperty("-webkit-app-region","no-drag");}if(companionGroup.parentElement!==openInGroup||companionGroup.nextSibling!==openInControl)openInGroup.insertBefore(companionGroup,openInControl);if(host.parentElement!==companionGroup)companionGroup.append(host);}
     else {
-    const labels=["Toggle pinned summary","Toggle bottom panel","Toggle side panel"];
+    const labels=["Toggle summary","Toggle pinned summary","Toggle bottom panel","Toggle side panel"];
     const candidates=labels.flatMap(label=>Array.from(document.querySelectorAll('button[aria-label="'+label+'"]')));
-    const anchor=candidates.find(button=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&rect.x>window.innerWidth/2;})||candidates[0];
+    const anchor=candidates.find(button=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&rect.top>=0&&rect.bottom<=54&&Boolean(button.closest("header"));})||candidates[0];
     const anchorWrapper=anchor?.parentElement;
     const group=anchorWrapper?.classList?.contains("contents")?anchorWrapper.parentElement:anchorWrapper;
     if(group){const meterHost=document.getElementById("codexion-sanity-meter-host");const reference=meterHost?.parentElement===group?meterHost.nextSibling:group.firstChild;if(host!==reference)group.insertBefore(host,reference);}

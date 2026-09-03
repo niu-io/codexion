@@ -6,8 +6,13 @@ import {
 
 describe("Issue Inbox UI", () => {
   it("uses semantic native anchors and exposes reversible actions", () => {
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('"Toggle summary"');
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('"Toggle pinned summary"');
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('"Toggle bottom panel"');
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('text==="Open in"');
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('aria-label="Secondary action"');
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain("companionGroup.nextSibling!==openInControl");
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).not.toContain("rect.x>window.innerWidth/2");
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain("meterHost.nextSibling");
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('classList?.contains("contents")');
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('role="tooltip">GitHub Issues');
@@ -15,6 +20,7 @@ describe("Issue Inbox UI", () => {
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain("codexion-settings-nav");
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain("codexion-issue-inbox-overlay");
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain("codexion-titlebar-actions");
+    expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain('host.style.marginInlineEnd = "6px"');
     expect(INSTALL_ISSUE_INBOX_EXPRESSION).toContain(
       'setProperty("-webkit-app-region", "no-drag")',
     );

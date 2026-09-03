@@ -3,12 +3,17 @@ import { createMeterUpdateExpression, INSTALL_METER_EXPRESSION } from "../src/ui
 
 describe("injected sanity meter", () => {
   it("places a compact speedometer before the native title-bar actions", () => {
+    expect(INSTALL_METER_EXPRESSION).toContain('"Toggle summary"');
     expect(INSTALL_METER_EXPRESSION).toContain('"Toggle pinned summary"');
     expect(INSTALL_METER_EXPRESSION).toContain('"Toggle bottom panel"');
-    expect(INSTALL_METER_EXPRESSION).toContain("rect.x > window.innerWidth / 2");
+    expect(INSTALL_METER_EXPRESSION).toContain('text === "Open in"');
+    expect(INSTALL_METER_EXPRESSION).toContain('aria-label="Secondary action"');
+    expect(INSTALL_METER_EXPRESSION).toContain("companionGroup.nextSibling !== openInControl");
+    expect(INSTALL_METER_EXPRESSION).not.toContain("rect.x > window.innerWidth / 2");
     expect(INSTALL_METER_EXPRESSION).toContain("host.nextSibling === issueHost");
-    expect(INSTALL_METER_EXPRESSION).toContain('classList?.contains("ms-auto")');
+    expect(INSTALL_METER_EXPRESSION).toContain('classList?.contains("contents")');
     expect(INSTALL_METER_EXPRESSION).toContain("codexion-titlebar-actions");
+    expect(INSTALL_METER_EXPRESSION).toContain('host.style.marginInlineEnd = "6px"');
     expect(INSTALL_METER_EXPRESSION).toContain('setProperty("-webkit-app-region", "no-drag")');
     expect(INSTALL_METER_EXPRESSION).toContain('viewBox", "0 0 20 20"');
     expect(INSTALL_METER_EXPRESSION).toContain("M10.8343 12.0693");

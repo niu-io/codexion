@@ -14,6 +14,7 @@ export const INSTALL_METER_EXPRESSION = `(() => {
   host.className = "no-drag";
   host.setAttribute("role", "status");
   host.setAttribute("aria-label", "Weekly usage unavailable");
+  host.style.marginInlineEnd = "6px";
   host.style.pointerEvents = "auto";
   host.style.setProperty("-webkit-app-region", "no-drag");
 
@@ -131,19 +132,24 @@ export const INSTALL_METER_EXPRESSION = `(() => {
   document.body.append(tooltipHost);
 
   const place = () => {
-    const openInButton = Array.from(document.querySelectorAll('button[aria-label="Open in"]')).find((button) => {
+    const isVisibleTitlebarButton = (button) => {
       const rect = button.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && rect.x > window.innerWidth / 2;
-    });
-    let openInControl = openInButton;
-    while (openInControl?.parentElement && !openInControl.parentElement.classList?.contains("ms-auto")) {
-      openInControl = openInControl.parentElement;
-    }
-    const openInGroup = openInControl?.parentElement?.classList?.contains("ms-auto")
-      ? openInControl.parentElement
+      return rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.bottom <= 54 && Boolean(button.closest("header"));
+    };
+    const buttons = Array.from(document.querySelectorAll("button"));
+    const openInButton = buttons.find((button) => {
+      if (!isVisibleTitlebarButton(button)) return false;
+      const label = (button.getAttribute("aria-label") || "").trim();
+      const text = (button.innerText || "").trim().replace(/\\s+/g, " ");
+      return label === "Open in" || text === "Open in";
+    }) || buttons.find((button) => button.getAttribute("aria-label") === "Secondary action" && isVisibleTitlebarButton(button))?.previousElementSibling;
+    const splitControl = openInButton?.parentElement?.querySelector('button[aria-label="Secondary action"]')
+      ? openInButton.parentElement
       : null;
+    const openInControl = splitControl || openInButton?.parentElement;
+    const openInGroup = openInControl?.parentElement;
     const issueHost = document.getElementById("codexion-issue-inbox-host");
-    if (openInGroup && openInControl) {
+    if (openInGroup && openInControl && openInGroup.closest("header")) {
       let companionGroup = document.getElementById("codexion-titlebar-actions");
       if (!companionGroup) {
         companionGroup = document.createElement("span");
@@ -151,32 +157,28 @@ export const INSTALL_METER_EXPRESSION = `(() => {
         companionGroup.className = "no-drag";
         companionGroup.style.alignItems = "center";
         companionGroup.style.display = "inline-flex";
-        companionGroup.style.gap = "6px";
-        companionGroup.style.marginInlineEnd = "6px";
+        companionGroup.style.gap = "0";
+        companionGroup.style.pointerEvents = "auto";
         companionGroup.style.setProperty("-webkit-app-region", "no-drag");
       }
-      if (companionGroup.parentElement !== openInControl) openInControl.insertBefore(companionGroup, openInControl.firstChild);
+      if (companionGroup.parentElement !== openInGroup || companionGroup.nextSibling !== openInControl) openInGroup.insertBefore(companionGroup, openInControl);
       const reference = issueHost?.parentElement === companionGroup ? issueHost : companionGroup.firstChild;
       if (host.parentElement !== companionGroup || (reference !== host && host.nextSibling !== reference)) companionGroup.insertBefore(host, reference);
       return;
     }
-    const labels = ["Toggle pinned summary", "Toggle bottom panel", "Toggle side panel"];
+    const labels = ["Toggle summary", "Toggle pinned summary", "Toggle bottom panel", "Toggle side panel"];
     const candidates = labels.flatMap((label) => Array.from(document.querySelectorAll('button[aria-label="' + label + '"]')));
     const anchor = candidates.find((button) => {
       const rect = button.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && rect.x > window.innerWidth / 2;
+      return rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.bottom <= 54 && Boolean(button.closest("header"));
     }) || candidates[0];
-    const localGroup = anchor?.parentElement;
-    if (!localGroup) {
+    const anchorWrapper = anchor?.parentElement;
+    const group = anchorWrapper?.classList?.contains("contents")
+      ? anchorWrapper.parentElement
+      : anchorWrapper;
+    if (!group) {
       host.remove();
       return;
-    }
-    let group = localGroup;
-    for (let element = localGroup; element && element.parentElement; element = element.parentElement) {
-      if (element.classList?.contains("ms-auto")) {
-        group = element;
-        break;
-      }
     }
     const reference = issueHost?.parentElement === group ? issueHost : group.firstChild;
     if (host.parentElement === group && (reference === host || host.nextSibling === issueHost)) return;

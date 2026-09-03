@@ -6,6 +6,17 @@ The project follows [Semantic Versioning](https://semver.org/) once public relea
 
 ## Unreleased
 
+## 0.3.3 - 2026-09-03
+
+### Fixed
+
+- Restore the quota and Issue Inbox controls to the active chat title bar after Codex changed the
+  Open in button markup and introduced multi-panel title-bar action groups.
+- Detect the visible title bar without assuming it occupies the right half of the full application
+  window, which keeps the controls attached to the chat when Review or other side panels are open.
+- Keep quota, Issue Inbox, and native title-bar actions in one stable container with the native 6px
+  spacing across both Open in and Summary layouts.
+
 ## 0.3.2 - 2026-08-16
 
 ### Added
