@@ -1,8 +1,8 @@
 import { type ChildProcessByStdio, spawn } from "node:child_process";
-import { join } from "node:path";
 import { createInterface } from "node:readline";
 import type { Readable, Writable } from "node:stream";
 import { CODEXION_VERSION } from "../version.js";
+import { resolveCodexExecutable } from "./executable.js";
 
 interface RpcResponse {
   error?: { message?: string };
@@ -33,7 +33,7 @@ export class CodexAppServerClient {
   static async create(
     appPath = process.env.CODEXION_APP_PATH ?? "/Applications/ChatGPT.app",
   ): Promise<CodexAppServerClient> {
-    const executable = join(appPath, "Contents", "Resources", "codex");
+    const executable = await resolveCodexExecutable(appPath);
     const child = spawn(executable, ["app-server", "--listen", "stdio://"], {
       shell: false,
       stdio: ["pipe", "pipe", "ignore"],

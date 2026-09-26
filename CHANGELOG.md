@@ -6,6 +6,13 @@ The project follows [Semantic Versioning](https://semver.org/) once public relea
 
 ## Unreleased
 
+## 0.3.4 - 2026-09-26
+
+### Fixed
+
+- Find the bundled Codex app-server in the latest ChatGPT app's `codex-cli` layout, while
+  retaining support for older releases. Report the checked paths if no executable is available.
+
 ## 0.3.3 - 2026-09-03
 
 ### Fixed
